@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>המאמן האישי שלי</title>
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f0f23">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,73 +11,46 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0f0f23;
-            color: #e0e0e0;
-            min-height: 100vh;
-            padding: 16px;
-            padding-bottom: 80px;
+            background: #0f0f23; color: #e0e0e0;
+            min-height: 100vh; padding: 16px; padding-bottom: 80px;
         }
         .container { max-width: 420px; margin: 0 auto; }
-
-        /* Header */
         .header { text-align: center; padding: 16px 0; }
         .header h1 { font-size: 26px; color: #fff; margin-bottom: 4px; }
         .header .date { color: #888; font-size: 13px; }
 
         /* Bottom Nav */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #1a1a2e;
-            display: flex;
-            justify-content: space-around;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1a1a2e; display: flex; justify-content: space-around;
             padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-            border-top: 1px solid #2a2a4a;
-            z-index: 100;
+            border-top: 1px solid #2a2a4a; z-index: 100;
         }
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            background: none;
-            border: none;
-            color: #555;
-            font-size: 10px;
-            cursor: pointer;
-            padding: 4px 12px;
-            transition: color 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            background: none; border: none; color: #555; font-size: 10px;
+            cursor: pointer; padding: 4px 12px;
         }
         .nav-item .nav-icon { font-size: 22px; }
         .nav-item.active { color: #00b4d8; }
 
-        /* Section visibility */
         .section { display: none; }
         .section.active { display: block; }
 
-        /* Cards */
         .card {
-            background: #1a1a2e;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 14px;
+            background: #1a1a2e; border-radius: 16px; padding: 20px; margin-bottom: 14px;
         }
         .card h2 { font-size: 18px; margin-bottom: 14px; color: #fff; }
-        .card h3 { font-size: 15px; margin-bottom: 10px; color: #ccc; }
 
         /* Inputs */
         .input-group { margin-bottom: 12px; }
-        .input-group label {
-            display: block; font-size: 12px; color: #888; margin-bottom: 3px;
-        }
+        .input-group label { display: block; font-size: 12px; color: #888; margin-bottom: 3px; }
         .input-group input, .input-group select {
             width: 100%; padding: 11px; border: 1px solid #2a2a4a;
             border-radius: 10px; background: #0f0f23; color: #fff;
             font-size: 16px; outline: none;
         }
-        .input-group input:focus, .input-group select:focus { border-color: #00b4d8; }
+        .input-group input:focus { border-color: #00b4d8; }
         .input-group input::placeholder { color: #555; }
         .row { display: flex; gap: 8px; }
         .row .input-group { flex: 1; }
@@ -87,7 +59,6 @@
         .btn {
             width: 100%; padding: 13px; border: none; border-radius: 12px;
             font-size: 15px; font-weight: 700; cursor: pointer;
-            transition: transform 0.1s;
         }
         .btn:active { transform: scale(0.97); }
         .btn:disabled { opacity: 0.5; }
@@ -98,46 +69,80 @@
         .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; border-radius: 8px; }
 
         /* Workout Type Selector */
-        .workout-types {
-            display: flex; gap: 8px; margin-bottom: 16px;
-        }
+        .workout-types { display: flex; gap: 8px; margin-bottom: 16px; }
         .workout-type-btn {
             flex: 1; padding: 14px 8px; border: 2px solid #2a2a4a;
             border-radius: 14px; background: transparent;
             color: #888; font-size: 13px; font-weight: 600;
-            cursor: pointer; text-align: center; transition: all 0.2s;
+            cursor: pointer; text-align: center;
         }
         .workout-type-btn .type-icon { font-size: 28px; display: block; margin-bottom: 4px; }
         .workout-type-btn.active { border-color: #00b4d8; color: #00b4d8; background: rgba(0,180,216,0.08); }
 
-        /* Exercise list */
-        .exercise-row {
+        /* Exercise template list (before starting workout) */
+        .template-exercise {
             background: #0f0f23; border-radius: 10px; padding: 12px;
-            margin-bottom: 8px; display: flex; justify-content: space-between;
-            align-items: center;
+            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
         }
-        .exercise-row .ex-name { color: #fff; font-weight: 600; font-size: 14px; margin-bottom: 2px; }
-        .exercise-row .ex-details { color: #888; font-size: 12px; }
-        .exercise-row .ex-inputs { display: flex; gap: 6px; align-items: center; }
-        .exercise-row .ex-inputs input {
-            width: 52px; padding: 8px 4px; text-align: center;
-            border: 1px solid #2a2a4a; border-radius: 8px;
-            background: #1a1a2e; color: #fff; font-size: 14px; outline: none;
-        }
-        .exercise-row .ex-inputs input:focus { border-color: #00b4d8; }
-        .exercise-row .ex-inputs label { font-size: 10px; color: #666; text-align: center; display: block; }
-
-        /* Delete/Edit buttons */
+        .template-exercise .te-name { color: #fff; font-weight: 600; font-size: 14px; }
+        .template-exercise .te-meta { color: #888; font-size: 12px; }
         .btn-icon {
             background: none; border: none; font-size: 16px;
-            cursor: pointer; padding: 6px; border-radius: 6px;
+            cursor: pointer; padding: 6px; border-radius: 6px; color: #888;
         }
-        .btn-icon:hover { background: rgba(255,255,255,0.05); }
 
-        /* Toggle */
-        .toggle-row {
-            display: flex; justify-content: space-between;
-            align-items: center; padding: 10px 0;
+        /* LIVE WORKOUT */
+        .live-workout-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 14px;
+        }
+        .live-workout-header h2 { margin: 0; font-size: 18px; color: #fff; }
+        .live-timer { color: #00b4d8; font-size: 14px; font-weight: 600; }
+
+        .live-exercise {
+            background: #1a1a2e; border-radius: 14px; padding: 16px; margin-bottom: 12px;
+        }
+        .live-exercise-name {
+            font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 10px;
+        }
+        .set-header {
+            display: flex; gap: 8px; align-items: center; padding: 4px 0;
+            font-size: 11px; color: #666; margin-bottom: 4px;
+        }
+        .set-header span:nth-child(1) { width: 40px; text-align: center; }
+        .set-header span:nth-child(2) { width: 60px; text-align: center; }
+        .set-header span:nth-child(3) { width: 60px; text-align: center; }
+        .set-header span:nth-child(4) { width: 60px; text-align: center; }
+        .set-header span:nth-child(5) { width: 40px; }
+
+        .set-row {
+            display: flex; gap: 8px; align-items: center; padding: 6px 0;
+            border-bottom: 1px solid #0f0f23;
+        }
+        .set-row.done { opacity: 0.5; }
+        .set-num {
+            width: 40px; text-align: center; font-size: 13px;
+            font-weight: 700; color: #00b4d8;
+        }
+        .set-input {
+            width: 60px; padding: 8px 4px; text-align: center;
+            border: 1px solid #2a2a4a; border-radius: 8px;
+            background: #0f0f23; color: #fff; font-size: 14px; outline: none;
+        }
+        .set-input:focus { border-color: #00b4d8; }
+        .set-check {
+            width: 40px; height: 36px; border-radius: 8px;
+            border: 2px solid #2a2a4a; background: transparent;
+            color: transparent; font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .set-check.checked {
+            background: #00c853; border-color: #00c853; color: #fff;
+        }
+        .add-set-btn {
+            background: none; border: 1px dashed #2a2a4a; border-radius: 8px;
+            color: #555; padding: 6px; margin-top: 6px; width: 100%;
+            cursor: pointer; font-size: 12px;
         }
 
         /* Timer */
@@ -148,7 +153,7 @@
         }
         .timer-display.running { color: #00b4d8; }
         .timer-display.done { color: #00c853; animation: pulse 0.5s ease infinite alternate; }
-        @keyframes pulse { from { opacity:1; transform:scale(1); } to { opacity:0.7; transform:scale(1.05); } }
+        @keyframes pulse { from { opacity:1; } to { opacity:0.7; } }
         .timer-presets { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
         .timer-preset {
             padding: 8px 16px; border: 2px solid #2a2a4a; border-radius: 10px;
@@ -158,8 +163,14 @@
         .timer-progress { width: 100%; height: 5px; background: #2a2a4a; border-radius: 3px; overflow: hidden; margin: 12px 0; }
         .timer-progress-bar { height: 100%; background: linear-gradient(90deg, #00b4d8, #00c853); border-radius: 3px; width: 100%; transition: width 0.3s linear; }
         .timer-controls { display: flex; gap: 10px; justify-content: center; }
+        .notif-btn {
+            display: block; margin: 10px auto 0; padding: 8px 14px;
+            border: 1px solid #2a2a4a; border-radius: 8px;
+            background: transparent; color: #888; font-size: 11px; cursor: pointer;
+        }
+        .notif-btn.granted { border-color: #00c853; color: #00c853; }
 
-        /* Measurement */
+        /* Measurements */
         .measurement-row {
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 0; border-bottom: 1px solid #1f1f3a;
@@ -190,18 +201,17 @@
         }
         .history-item:last-child { border-bottom: none; }
 
-        /* Empty/Status */
         .empty-state { text-align: center; padding: 40px 20px; color: #555; }
         .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
         .status { text-align: center; padding: 8px; font-size: 13px; color: #888; min-height: 24px; }
         .status.success { color: #00c853; }
         .status.error { color: #ff4757; }
 
-        /* Add exercise modal */
+        /* Modal */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center;
-            padding: 20px;
+            background: rgba(0,0,0,0.7); z-index: 200; align-items: center;
+            justify-content: center; padding: 20px;
         }
         .modal-overlay.open { display: flex; }
         .modal {
@@ -209,23 +219,6 @@
             width: 100%; max-width: 360px;
         }
         .modal h2 { font-size: 18px; color: #fff; margin-bottom: 16px; text-align: center; }
-
-        /* Notification */
-        .notif-btn {
-            display: block; margin: 10px auto 0; padding: 8px 14px;
-            border: 1px solid #2a2a4a; border-radius: 8px;
-            background: transparent; color: #888; font-size: 11px; cursor: pointer;
-        }
-        .notif-btn.granted { border-color: #00c853; color: #00c853; }
-
-        /* Running log */
-        .run-entry {
-            background: #0f0f23; border-radius: 10px; padding: 12px; margin-bottom: 8px;
-        }
-        .run-entry .run-header { color: #fff; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
-        .run-entry .run-stats { display: flex; gap: 12px; flex-wrap: wrap; }
-        .run-entry .run-stat { font-size: 12px; color: #888; }
-        .run-entry .run-stat span { color: #00b4d8; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -249,26 +242,34 @@
             </button>
         </div>
 
-        <!-- Upper/Lower body workout -->
-        <div id="strengthSection">
+        <!-- Template view (before starting) -->
+        <div id="templateView">
             <div class="card">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-                    <h2 id="strengthTitle">אימון גוף עליון</h2>
-                    <button class="btn btn-sm btn-blue" onclick="openAddExercise()">+ תרגיל</button>
+                    <h2 id="templateTitle">אימון גוף עליון</h2>
+                    <button class="btn btn-sm btn-gray" onclick="openAddExercise()">+ תרגיל</button>
                 </div>
-                <div id="exerciseList">
-                    <div class="empty-state">
-                        <div class="icon">&#128221;</div>
-                        <p>לחץ "+ תרגיל" כדי להוסיף תרגילים</p>
-                    </div>
-                </div>
+                <div id="templateList"></div>
             </div>
-            <button class="btn btn-green" onclick="saveStrengthWorkout()" id="btnSaveStrength" style="display:none;">
-                &#128190; שמור אימון
+            <button class="btn btn-blue" id="btnStartWorkout" onclick="startLiveWorkout()" style="display:none;">
+                &#9654; התחל אימון
             </button>
         </div>
 
-        <!-- Running workout -->
+        <!-- Live workout view -->
+        <div id="liveView" style="display:none;">
+            <div class="live-workout-header">
+                <h2 id="liveTitle">&#128293; אימון פעיל</h2>
+                <span class="live-timer" id="workoutTimer">00:00</span>
+            </div>
+            <div id="liveExercises"></div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+                <button class="btn btn-green" onclick="saveLiveWorkout()" style="flex:1;">&#128190; שמור אימון</button>
+                <button class="btn btn-red btn-sm" onclick="cancelLiveWorkout()" style="width:80px;">ביטול</button>
+            </div>
+        </div>
+
+        <!-- Running section -->
         <div id="runSection" style="display:none;">
             <div class="card">
                 <h2>&#127939; אימון ריצה</h2>
@@ -280,65 +281,28 @@
                         <span class="type-icon">&#9889;</span>אינטרוולים
                     </button>
                 </div>
-
-                <!-- Long run -->
                 <div id="longRunForm">
                     <div class="row">
-                        <div class="input-group">
-                            <label>זמן (דקות)</label>
-                            <input type="number" id="runTime" placeholder="30" min="1">
-                        </div>
-                        <div class="input-group">
-                            <label>מרחק (ק"מ)</label>
-                            <input type="number" id="runDistance" placeholder="5" min="0" step="0.1">
-                        </div>
+                        <div class="input-group"><label>זמן (דקות)</label><input type="number" id="runTime" placeholder="30" min="1"></div>
+                        <div class="input-group"><label>מרחק (ק"מ)</label><input type="number" id="runDistance" placeholder="5" min="0" step="0.1"></div>
                     </div>
                     <div class="row">
-                        <div class="input-group">
-                            <label>מהירות ממוצעת</label>
-                            <input type="number" id="runSpeed" placeholder="10" min="0" step="0.1">
-                        </div>
-                        <div class="input-group">
-                            <label>קצב (דק'/ק"מ)</label>
-                            <input type="number" id="runPace" placeholder="6:00" min="0" step="0.1">
-                        </div>
+                        <div class="input-group"><label>מהירות ממוצעת</label><input type="number" id="runSpeed" placeholder="10" min="0" step="0.1"></div>
+                        <div class="input-group"><label>קצב (דק'/ק"מ)</label><input type="number" id="runPace" placeholder="6:00" min="0" step="0.1"></div>
                     </div>
-                    <div class="input-group">
-                        <label>הערות</label>
-                        <input type="text" id="runNotes" placeholder="איך הרגשתי, מזג אוויר...">
-                    </div>
+                    <div class="input-group"><label>הערות</label><input type="text" id="runNotes" placeholder="איך הרגשתי, מזג אוויר..."></div>
                 </div>
-
-                <!-- Interval run -->
                 <div id="intervalRunForm" style="display:none;">
                     <div class="row">
-                        <div class="input-group">
-                            <label>סבבים</label>
-                            <input type="number" id="intervalRounds" placeholder="4" min="1" value="4">
-                        </div>
-                        <div class="input-group">
-                            <label>ריצה (דק')</label>
-                            <input type="number" id="intervalRunMin" placeholder="4" min="1" value="4">
-                        </div>
-                        <div class="input-group">
-                            <label>מנוחה (דק')</label>
-                            <input type="number" id="intervalRestMin" placeholder="4" min="1" value="4">
-                        </div>
+                        <div class="input-group"><label>סבבים</label><input type="number" id="intervalRounds" value="4" min="1"></div>
+                        <div class="input-group"><label>ריצה (דק')</label><input type="number" id="intervalRunMin" value="4" min="1"></div>
+                        <div class="input-group"><label>מנוחה (דק')</label><input type="number" id="intervalRestMin" value="4" min="1"></div>
                     </div>
                     <div class="row">
-                        <div class="input-group">
-                            <label>מהירות ריצה</label>
-                            <input type="number" id="intervalSpeed" placeholder="12" min="0" step="0.1">
-                        </div>
-                        <div class="input-group">
-                            <label>מרחק כולל (ק"מ)</label>
-                            <input type="number" id="intervalDistance" placeholder="4" min="0" step="0.1">
-                        </div>
+                        <div class="input-group"><label>מהירות ריצה</label><input type="number" id="intervalSpeed" placeholder="12" min="0" step="0.1"></div>
+                        <div class="input-group"><label>מרחק כולל (ק"מ)</label><input type="number" id="intervalDistance" placeholder="4" min="0" step="0.1"></div>
                     </div>
-                    <div class="input-group">
-                        <label>הערות</label>
-                        <input type="text" id="intervalNotes" placeholder="רמת קושי, תחושה...">
-                    </div>
+                    <div class="input-group"><label>הערות</label><input type="text" id="intervalNotes" placeholder="רמת קושי, תחושה..."></div>
                 </div>
             </div>
             <button class="btn btn-green" onclick="saveRunWorkout()">&#128190; שמור ריצה</button>
@@ -359,16 +323,12 @@
                 <button class="timer-preset" onclick="setPreset(180)">3:00</button>
             </div>
             <div class="timer-display" id="timerDisplay">1:00</div>
-            <div class="timer-progress">
-                <div class="timer-progress-bar" id="timerProgress"></div>
-            </div>
+            <div class="timer-progress"><div class="timer-progress-bar" id="timerProgress"></div></div>
             <div class="timer-controls" style="margin-top:14px;">
                 <button class="btn btn-blue" id="btnTimerStart" onclick="toggleTimer()" style="flex:1;">התחל</button>
                 <button class="btn btn-gray" onclick="resetTimer()" style="width:60px;">&#8635;</button>
             </div>
-            <button class="notif-btn" id="notifBtn" onclick="requestNotificationPermission()">
-                &#128276; הפעל התראות לצפצוף ברקע
-            </button>
+            <button class="notif-btn" id="notifBtn" onclick="requestNotificationPermission()">&#128276; הפעל התראות לצפצוף ברקע</button>
         </div>
     </div>
 
@@ -376,34 +336,13 @@
     <div class="section" id="sectionMeasure">
         <div class="card">
             <h2>&#128207; מדידות גוף</h2>
-            <div class="measurement-row">
-                <span class="measurement-label">&#9878; משקל</span>
-                <div><input class="measurement-input" type="number" id="mWeight" step="0.1" placeholder="--"><span class="measurement-unit">ק"ג</span></div>
-            </div>
-            <div class="measurement-row">
-                <span class="measurement-label">&#128170; זרוע ימין</span>
-                <div><input class="measurement-input" type="number" id="mArmR" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div>
-            </div>
-            <div class="measurement-row">
-                <span class="measurement-label">&#128170; זרוע שמאל</span>
-                <div><input class="measurement-input" type="number" id="mArmL" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div>
-            </div>
-            <div class="measurement-row">
-                <span class="measurement-label">&#127918; חזה</span>
-                <div><input class="measurement-input" type="number" id="mChest" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div>
-            </div>
-            <div class="measurement-row">
-                <span class="measurement-label">&#128178; בטן</span>
-                <div><input class="measurement-input" type="number" id="mWaist" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div>
-            </div>
-            <div class="measurement-row">
-                <span class="measurement-label">&#129461; ירך ימין</span>
-                <div><input class="measurement-input" type="number" id="mThighR" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div>
-            </div>
-            <div class="measurement-row">
-                <span class="measurement-label">&#129461; ירך שמאל</span>
-                <div><input class="measurement-input" type="number" id="mThighL" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div>
-            </div>
+            <div class="measurement-row"><span class="measurement-label">&#9878; משקל</span><div><input class="measurement-input" type="number" id="mWeight" step="0.1" placeholder="--"><span class="measurement-unit">ק"ג</span></div></div>
+            <div class="measurement-row"><span class="measurement-label">&#128170; זרוע ימין</span><div><input class="measurement-input" type="number" id="mArmR" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div></div>
+            <div class="measurement-row"><span class="measurement-label">&#128170; זרוע שמאל</span><div><input class="measurement-input" type="number" id="mArmL" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div></div>
+            <div class="measurement-row"><span class="measurement-label">&#127918; חזה</span><div><input class="measurement-input" type="number" id="mChest" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div></div>
+            <div class="measurement-row"><span class="measurement-label">&#128178; בטן</span><div><input class="measurement-input" type="number" id="mWaist" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div></div>
+            <div class="measurement-row"><span class="measurement-label">&#129461; ירך ימין</span><div><input class="measurement-input" type="number" id="mThighR" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div></div>
+            <div class="measurement-row"><span class="measurement-label">&#129461; ירך שמאל</span><div><input class="measurement-input" type="number" id="mThighL" step="0.1" placeholder="--"><span class="measurement-unit">ס"מ</span></div></div>
         </div>
         <button class="btn btn-green" onclick="saveMeasurements()">&#128190; שמור מדידות</button>
         <div class="status" id="statusMeasure"></div>
@@ -412,47 +351,27 @@
     <!-- ====== HISTORY SECTION ====== -->
     <div class="section" id="sectionHistory">
         <div id="historyContent">
-            <div class="empty-state">
-                <div class="icon">&#128221;</div>
-                <p>היסטוריה תופיע כאן אחרי חיבור ה-API</p>
-            </div>
+            <div class="empty-state"><div class="icon">&#128221;</div><p>היסטוריה תופיע אחרי שמירת אימון</p></div>
         </div>
     </div>
 </div>
 
 <!-- Bottom Navigation -->
 <div class="bottom-nav">
-    <button class="nav-item active" onclick="switchSection('workout')">
-        <span class="nav-icon">&#127947;</span>אימון
-    </button>
-    <button class="nav-item" onclick="switchSection('timer')">
-        <span class="nav-icon">&#9201;</span>טיימר
-    </button>
-    <button class="nav-item" onclick="switchSection('measure')">
-        <span class="nav-icon">&#128207;</span>מדידות
-    </button>
-    <button class="nav-item" onclick="switchSection('history')">
-        <span class="nav-icon">&#128202;</span>היסטוריה
-    </button>
+    <button class="nav-item active" onclick="switchSection('workout')"><span class="nav-icon">&#127947;</span>אימון</button>
+    <button class="nav-item" onclick="switchSection('timer')"><span class="nav-icon">&#9201;</span>טיימר</button>
+    <button class="nav-item" onclick="switchSection('measure')"><span class="nav-icon">&#128207;</span>מדידות</button>
+    <button class="nav-item" onclick="switchSection('history')"><span class="nav-icon">&#128202;</span>היסטוריה</button>
 </div>
 
 <!-- Add Exercise Modal -->
 <div class="modal-overlay" id="addExerciseModal">
     <div class="modal">
         <h2>הוסף תרגיל</h2>
-        <div class="input-group">
-            <label>שם התרגיל</label>
-            <input type="text" id="newExerciseName" placeholder="למשל: לחיצת חזה">
-        </div>
+        <div class="input-group"><label>שם התרגיל</label><input type="text" id="newExerciseName" placeholder="למשל: לחיצת חזה"></div>
         <div class="row">
-            <div class="input-group">
-                <label>סטים (ברירת מחדל)</label>
-                <input type="number" id="newExerciseSets" placeholder="3" value="3" min="1">
-            </div>
-            <div class="input-group">
-                <label>חזרות (ברירת מחדל)</label>
-                <input type="number" id="newExerciseReps" placeholder="12" value="12" min="1">
-            </div>
+            <div class="input-group"><label>סטים</label><input type="number" id="newExerciseSets" value="3" min="1"></div>
+            <div class="input-group"><label>חזרות</label><input type="number" id="newExerciseReps" value="12" min="1"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px;">
             <button class="btn btn-blue" onclick="addExerciseToTemplate()" style="flex:1;">הוסף</button>
@@ -464,21 +383,20 @@
 <script>
 // ====== CONFIG ======
 const API_URL = 'https://script.google.com/macros/s/AKfycbz0ypZhIE6PXBRy0nVTTlNjAF6i5cVgslZn3l4OkC56Rknn0zVwvB6aGwuxzZs7Opo/exec';
-
-// ====== STATE ======
-let currentWorkoutType = 'upper'; // upper, lower, run
-let currentRunType = 'long'; // long, interval
 const STORAGE_KEY = 'fitness_templates';
 
-// Load templates from localStorage
+// ====== STATE ======
+let currentWorkoutType = 'upper';
+let currentRunType = 'long';
+let workoutActive = false;
+let workoutStartTime = null;
+let workoutTimerInterval = null;
+
 function loadTemplates() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
-    return { upper: [], lower: [] };
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? JSON.parse(s) : { upper: [], lower: [] };
 }
-function saveTemplates(t) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(t));
-}
+function saveTemplates(t) { localStorage.setItem(STORAGE_KEY, JSON.stringify(t)); }
 let templates = loadTemplates();
 
 // ====== INIT ======
@@ -491,45 +409,37 @@ function switchSection(name) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('section' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
-    // Mark active nav
-    const navItems = document.querySelectorAll('.nav-item');
     const idx = ['workout','timer','measure','history'].indexOf(name);
-    if (idx >= 0) navItems[idx].classList.add('active');
+    if (idx >= 0) document.querySelectorAll('.nav-item')[idx].classList.add('active');
     if (name === 'history') loadHistory();
 }
 
 // ====== WORKOUT TYPE ======
 function selectWorkoutType(type) {
+    if (workoutActive) return; // Don't switch during live workout
     currentWorkoutType = type;
     document.querySelectorAll('.workout-type-btn').forEach(b => b.classList.remove('active'));
     event.currentTarget.classList.add('active');
 
     if (type === 'run') {
-        document.getElementById('strengthSection').style.display = 'none';
+        document.getElementById('templateView').style.display = 'none';
+        document.getElementById('liveView').style.display = 'none';
         document.getElementById('runSection').style.display = 'block';
     } else {
-        document.getElementById('strengthSection').style.display = 'block';
+        document.getElementById('templateView').style.display = 'block';
+        document.getElementById('liveView').style.display = 'none';
         document.getElementById('runSection').style.display = 'none';
-        document.getElementById('strengthTitle').textContent =
+        document.getElementById('templateTitle').textContent =
             type === 'upper' ? 'אימון גוף עליון' : 'אימון גוף תחתון';
-        renderExercises();
+        renderTemplates();
     }
 }
 
-// ====== RUN TYPE ======
-function selectRunType(type) {
-    currentRunType = type;
-    document.getElementById('btnRunLong').classList.toggle('active', type === 'long');
-    document.getElementById('btnRunInterval').classList.toggle('active', type === 'interval');
-    document.getElementById('longRunForm').style.display = type === 'long' ? 'block' : 'none';
-    document.getElementById('intervalRunForm').style.display = type === 'interval' ? 'block' : 'none';
-}
-
-// ====== EXERCISE TEMPLATES ======
-function renderExercises() {
-    const list = document.getElementById('exerciseList');
+// ====== TEMPLATE VIEW ======
+function renderTemplates() {
+    const list = document.getElementById('templateList');
     const exercises = templates[currentWorkoutType] || [];
-    const btn = document.getElementById('btnSaveStrength');
+    const btn = document.getElementById('btnStartWorkout');
 
     if (exercises.length === 0) {
         list.innerHTML = '<div class="empty-state"><div class="icon">&#128221;</div><p>לחץ "+ תרגיל" כדי להוסיף תרגילים</p></div>';
@@ -539,23 +449,10 @@ function renderExercises() {
 
     btn.style.display = 'block';
     list.innerHTML = exercises.map((ex, i) => `
-        <div class="exercise-row">
-            <div style="flex:1;">
-                <div class="ex-name">${ex.name}</div>
-                <div class="ex-inputs" style="margin-top:6px;">
-                    <div>
-                        <label>סטים</label>
-                        <input type="number" id="ex_sets_${i}" value="${ex.defaultSets}" min="1">
-                    </div>
-                    <div>
-                        <label>חזרות</label>
-                        <input type="number" id="ex_reps_${i}" value="${ex.defaultReps}" min="1">
-                    </div>
-                    <div>
-                        <label>משקל</label>
-                        <input type="number" id="ex_weight_${i}" value="${ex.lastWeight || ''}" min="0" step="0.5" placeholder="0">
-                    </div>
-                </div>
+        <div class="template-exercise">
+            <div>
+                <div class="te-name">${ex.name}</div>
+                <div class="te-meta">${ex.defaultSets} סטים x ${ex.defaultReps} חזרות${ex.lastWeight ? ' | ' + ex.lastWeight + ' ק"ג' : ''}</div>
             </div>
             <button class="btn-icon" onclick="removeExercise(${i})" title="מחק">&#128465;</button>
         </div>
@@ -569,81 +466,187 @@ function openAddExercise() {
     document.getElementById('newExerciseReps').value = '12';
     setTimeout(() => document.getElementById('newExerciseName').focus(), 100);
 }
-
-function closeAddExercise() {
-    document.getElementById('addExerciseModal').classList.remove('open');
-}
+function closeAddExercise() { document.getElementById('addExerciseModal').classList.remove('open'); }
 
 function addExerciseToTemplate() {
     const name = document.getElementById('newExerciseName').value.trim();
     const sets = document.getElementById('newExerciseSets').value || '3';
     const reps = document.getElementById('newExerciseReps').value || '12';
     if (!name) return;
-
     if (!templates[currentWorkoutType]) templates[currentWorkoutType] = [];
     templates[currentWorkoutType].push({ name, defaultSets: sets, defaultReps: reps, lastWeight: '' });
     saveTemplates(templates);
-    renderExercises();
+    renderTemplates();
     closeAddExercise();
 }
 
 function removeExercise(index) {
     templates[currentWorkoutType].splice(index, 1);
     saveTemplates(templates);
-    renderExercises();
+    renderTemplates();
 }
 
-// Init render
-renderExercises();
+renderTemplates();
 
-// ====== SAVE STRENGTH WORKOUT ======
-async function saveStrengthWorkout() {
+// ====== LIVE WORKOUT ======
+function startLiveWorkout() {
     const exercises = templates[currentWorkoutType] || [];
     if (exercises.length === 0) return;
 
-    const btn = document.getElementById('btnSaveStrength');
-    btn.disabled = true;
-    btn.textContent = 'שומר...';
+    workoutActive = true;
+    workoutStartTime = Date.now();
+    document.getElementById('templateView').style.display = 'none';
+    document.getElementById('liveView').style.display = 'block';
+
+    const type = currentWorkoutType === 'upper' ? 'גוף עליון' : 'גוף תחתון';
+    document.getElementById('liveTitle').innerHTML = `&#128293; ${type}`;
+
+    // Start workout timer
+    workoutTimerInterval = setInterval(updateWorkoutTimer, 1000);
+
+    // Render exercises with sets
+    const container = document.getElementById('liveExercises');
+    container.innerHTML = exercises.map((ex, ei) => {
+        const numSets = parseInt(ex.defaultSets) || 3;
+        const defaultReps = ex.defaultReps || '12';
+        const lastWeight = ex.lastWeight || '';
+        let setsHTML = '';
+        for (let si = 0; si < numSets; si++) {
+            setsHTML += `
+                <div class="set-row" id="set_${ei}_${si}">
+                    <span class="set-num">${si + 1}</span>
+                    <input class="set-input" type="number" id="reps_${ei}_${si}" value="${defaultReps}" min="1">
+                    <input class="set-input" type="number" id="weight_${ei}_${si}" value="${lastWeight}" placeholder="0" min="0" step="0.5">
+                    <button class="set-check" id="check_${ei}_${si}" onclick="toggleSet(${ei},${si})">&#10003;</button>
+                </div>
+            `;
+        }
+        return `
+            <div class="live-exercise" id="exercise_${ei}">
+                <div class="live-exercise-name">${ex.name}</div>
+                <div class="set-header">
+                    <span>סט</span><span>חזרות</span><span>משקל</span><span></span>
+                </div>
+                ${setsHTML}
+                <button class="add-set-btn" onclick="addSet(${ei})">+ הוסף סט</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function updateWorkoutTimer() {
+    const elapsed = Math.floor((Date.now() - workoutStartTime) / 1000);
+    const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const s = (elapsed % 60).toString().padStart(2, '0');
+    document.getElementById('workoutTimer').textContent = `${m}:${s}`;
+}
+
+function toggleSet(ei, si) {
+    const check = document.getElementById(`check_${ei}_${si}`);
+    const row = document.getElementById(`set_${ei}_${si}`);
+    const isChecked = check.classList.toggle('checked');
+    row.classList.toggle('done', isChecked);
+
+    // Auto-start rest timer when checking a set
+    if (isChecked && typeof resetTimer === 'function') {
+        resetTimer();
+        startTimer();
+    }
+}
+
+function addSet(ei) {
+    const exercise = document.getElementById(`exercise_${ei}`);
+    const rows = exercise.querySelectorAll('.set-row');
+    const si = rows.length;
+    const lastRow = rows[rows.length - 1];
+    const prevReps = lastRow.querySelector(`[id^="reps_"]`).value;
+    const prevWeight = lastRow.querySelector(`[id^="weight_"]`).value;
+
+    const newRow = document.createElement('div');
+    newRow.className = 'set-row';
+    newRow.id = `set_${ei}_${si}`;
+    newRow.innerHTML = `
+        <span class="set-num">${si + 1}</span>
+        <input class="set-input" type="number" id="reps_${ei}_${si}" value="${prevReps}" min="1">
+        <input class="set-input" type="number" id="weight_${ei}_${si}" value="${prevWeight}" placeholder="0" min="0" step="0.5">
+        <button class="set-check" id="check_${ei}_${si}" onclick="toggleSet(${ei},${si})">&#10003;</button>
+    `;
+    exercise.querySelector('.add-set-btn').before(newRow);
+}
+
+function cancelLiveWorkout() {
+    if (!confirm('בטוח שאתה רוצה לבטל את האימון?')) return;
+    endLiveWorkout();
+}
+
+function endLiveWorkout() {
+    workoutActive = false;
+    clearInterval(workoutTimerInterval);
+    document.getElementById('liveView').style.display = 'none';
+    document.getElementById('templateView').style.display = 'block';
+    document.getElementById('workoutTimer').textContent = '00:00';
+}
+
+async function saveLiveWorkout() {
+    const exercises = templates[currentWorkoutType] || [];
     const today = new Date().toLocaleDateString('he-IL');
     const type = currentWorkoutType === 'upper' ? 'גוף עליון' : 'גוף תחתון';
+    const elapsed = Math.floor((Date.now() - workoutStartTime) / 1000);
+    const duration = `${Math.floor(elapsed/60)}:${(elapsed%60).toString().padStart(2,'0')}`;
+
+    const btn = document.querySelector('#liveView .btn-green');
+    btn.disabled = true;
+    btn.textContent = 'שומר...';
+
     let savedCount = 0;
-
     try {
-        for (let i = 0; i < exercises.length; i++) {
-            const sets = document.getElementById(`ex_sets_${i}`).value;
-            const reps = document.getElementById(`ex_reps_${i}`).value;
-            const weight = document.getElementById(`ex_weight_${i}`).value || '0';
+        for (let ei = 0; ei < exercises.length; ei++) {
+            const exercise = document.getElementById(`exercise_${ei}`);
+            const rows = exercise.querySelectorAll('.set-row');
+            for (let si = 0; si < rows.length; si++) {
+                const checked = document.getElementById(`check_${ei}_${si}`).classList.contains('checked');
+                if (!checked) continue; // Only save completed sets
+                const reps = document.getElementById(`reps_${ei}_${si}`).value;
+                const weight = document.getElementById(`weight_${ei}_${si}`).value || '0';
 
-            // Save last weight to template
-            templates[currentWorkoutType][i].lastWeight = weight;
+                // Save last weight to template
+                if (si === 0) templates[currentWorkoutType][ei].lastWeight = weight;
 
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({
-                    action: 'add',
-                    date: today,
-                    exercise: `[${type}] ${exercises[i].name}`,
-                    sets, reps, weight, notes: ''
-                })
-            });
-            const result = await response.json();
-            if (result.success) savedCount++;
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'add', date: today,
+                        exercise: `[${type}] ${exercises[ei].name}`,
+                        sets: `${si + 1}`, reps, weight,
+                        notes: si === 0 ? `משך: ${duration}` : ''
+                    })
+                });
+                savedCount++;
+            }
         }
         saveTemplates(templates);
-        showStatus(`${savedCount} תרגילים נשמרו!`, 'success');
+        showStatus(`${savedCount} סטים נשמרו!`, 'success');
+        endLiveWorkout();
     } catch (err) {
-        showStatus('שגיאה בשמירה — בדוק חיבור', 'error');
+        showStatus('שגיאה בשמירה', 'error');
     }
     btn.disabled = false;
     btn.innerHTML = '&#128190; שמור אימון';
 }
 
-// ====== SAVE RUN WORKOUT ======
+// ====== RUN ======
+function selectRunType(type) {
+    currentRunType = type;
+    document.getElementById('btnRunLong').classList.toggle('active', type === 'long');
+    document.getElementById('btnRunInterval').classList.toggle('active', type === 'interval');
+    document.getElementById('longRunForm').style.display = type === 'long' ? 'block' : 'none';
+    document.getElementById('intervalRunForm').style.display = type === 'interval' ? 'block' : 'none';
+}
+
 async function saveRunWorkout() {
     const today = new Date().toLocaleDateString('he-IL');
     let exercise, notes;
-
     if (currentRunType === 'long') {
         const time = document.getElementById('runTime').value;
         const dist = document.getElementById('runDistance').value;
@@ -651,7 +654,7 @@ async function saveRunWorkout() {
         const pace = document.getElementById('runPace').value;
         notes = document.getElementById('runNotes').value;
         if (!time && !dist) { showStatus('נא למלא זמן או מרחק', 'error'); return; }
-        exercise = `[ריצה ארוכה] ${time || '-'} דק' | ${dist || '-'} ק"מ | מהירות ${speed || '-'} | קצב ${pace || '-'}`;
+        exercise = `[ריצה ארוכה] ${time||'-'} דק' | ${dist||'-'} ק"מ | מהירות ${speed||'-'} | קצב ${pace||'-'}`;
     } else {
         const rounds = document.getElementById('intervalRounds').value;
         const runMin = document.getElementById('intervalRunMin').value;
@@ -659,29 +662,21 @@ async function saveRunWorkout() {
         const speed = document.getElementById('intervalSpeed').value;
         const dist = document.getElementById('intervalDistance').value;
         notes = document.getElementById('intervalNotes').value;
-        exercise = `[אינטרוולים ${rounds}x${runMin}/${restMin}] מהירות ${speed || '-'} | ${dist || '-'} ק"מ`;
+        exercise = `[אינטרוולים ${rounds}x${runMin}/${restMin}] מהירות ${speed||'-'} | ${dist||'-'} ק"מ`;
     }
-
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({
-                action: 'add', date: today, exercise,
-                sets: '', reps: '', weight: '', notes: notes || ''
-            })
+        await fetch(API_URL, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'add', date: today, exercise, sets:'', reps:'', weight:'', notes: notes||'' })
         });
-        const result = await response.json();
-        if (result.success) showStatus('ריצה נשמרה!', 'success');
-    } catch (err) {
-        showStatus('שגיאה בשמירה', 'error');
-    }
+        showStatus('ריצה נשמרה!', 'success');
+    } catch (err) { showStatus('שגיאה בשמירה', 'error'); }
 }
 
-// ====== SAVE MEASUREMENTS ======
+// ====== MEASUREMENTS ======
 async function saveMeasurements() {
     const today = new Date().toLocaleDateString('he-IL');
-    const measurements = {
+    const m = {
         'משקל': document.getElementById('mWeight').value,
         'זרוע ימין': document.getElementById('mArmR').value,
         'זרוע שמאל': document.getElementById('mArmL').value,
@@ -690,30 +685,17 @@ async function saveMeasurements() {
         'ירך ימין': document.getElementById('mThighR').value,
         'ירך שמאל': document.getElementById('mThighL').value,
     };
-
-    const filled = Object.entries(measurements).filter(([k, v]) => v);
-    if (filled.length === 0) {
-        showStatusMeasure('נא למלא לפחות מדד אחד', 'error');
-        return;
-    }
-
+    const filled = Object.entries(m).filter(([k,v]) => v);
+    if (filled.length === 0) { showStatusMeasure('נא למלא לפחות מדד אחד', 'error'); return; }
     try {
         for (const [name, value] of filled) {
             await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({
-                    action: 'add', date: today,
-                    exercise: `[מדידה] ${name}`,
-                    sets: '', reps: '', weight: value,
-                    notes: name === 'משקל' ? 'ק"ג' : 'ס"מ'
-                })
+                method: 'POST', headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ action:'add', date:today, exercise:`[מדידה] ${name}`, sets:'', reps:'', weight:value, notes: name==='משקל'?'ק"ג':'ס"מ' })
             });
         }
         showStatusMeasure(`${filled.length} מדידות נשמרו!`, 'success');
-    } catch (err) {
-        showStatusMeasure('שגיאה בשמירה', 'error');
-    }
+    } catch (err) { showStatusMeasure('שגיאה בשמירה', 'error'); }
 }
 
 // ====== HISTORY ======
@@ -721,8 +703,8 @@ async function loadHistory() {
     const container = document.getElementById('historyContent');
     container.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">&#8987; טוען...</div>';
     try {
-        const response = await fetch(API_URL);
-        const result = await response.json();
+        const r = await fetch(API_URL);
+        const result = await r.json();
         if (!result.data || result.data.length === 0) {
             container.innerHTML = '<div class="empty-state"><div class="icon">&#128221;</div><p>אין נתונים עדיין</p></div>';
             return;
@@ -736,18 +718,15 @@ async function loadHistory() {
         const dates = Object.keys(grouped).reverse();
         container.innerHTML = dates.map(date => `
             <div class="history-day">
-                <div class="day-header">
-                    <h3>${date}</h3>
-                    <span>${grouped[date].length} רשומות</span>
-                </div>
+                <div class="day-header"><h3>${date}</h3><span>${grouped[date].length} רשומות</span></div>
                 ${grouped[date].map(row => {
-                    const ex = row['\u05ea\u05e8\u05d2\u05d9\u05dc'] || row['תרגיל'] || '';
-                    const sets = row['\u05e1\u05d8\u05d9\u05dd'] || row['סטים'] || '';
-                    const reps = row['\u05d7\u05d6\u05e8\u05d5\u05ea'] || row['חזרות'] || '';
-                    const weight = row['\u05de\u05e9\u05e7\u05dc (\u05e7"\u05d2)'] || row['משקל (ק"ג)'] || '';
-                    const details = sets && reps ? `${sets}x${reps}` : '';
-                    const w = weight ? ` | ${weight}` : '';
-                    return `<div class="history-item"><span style="color:#e0e0e0;">${ex}</span><span style="color:#888;font-size:12px;">${details}${w}</span></div>`;
+                    const ex = row['\u05ea\u05e8\u05d2\u05d9\u05dc']||row['תרגיל']||'';
+                    const sets = row['\u05e1\u05d8\u05d9\u05dd']||row['סטים']||'';
+                    const reps = row['\u05d7\u05d6\u05e8\u05d5\u05ea']||row['חזרות']||'';
+                    const weight = row['\u05de\u05e9\u05e7\u05dc (\u05e7"\u05d2)']||row['משקל (ק"ג)']||'';
+                    const d = sets&&reps ? `סט ${sets}: ${reps} חזרות` : '';
+                    const w = weight ? ` | ${weight} ק"ג` : '';
+                    return `<div class="history-item"><span style="color:#e0e0e0;">${ex}</span><span style="color:#888;font-size:12px;">${d}${w}</span></div>`;
                 }).join('')}
             </div>
         `).join('');
@@ -779,7 +758,6 @@ function playBeep(times) {
     }
     beepOnce();
 }
-
 function requestNotificationPermission() {
     if (!('Notification' in window)) return;
     Notification.requestPermission().then(p => {
@@ -799,7 +777,6 @@ if ('Notification' in window && Notification.permission === 'granted') {
 }
 
 let timerSeconds = 60, timerTotal = 60, timerInterval = null, timerRunning = false, bgWorker = null;
-
 function setPreset(s) {
     if (timerRunning) return;
     timerSeconds = s; timerTotal = s;
@@ -811,7 +788,7 @@ function setPreset(s) {
 }
 function updateTimerDisplay() {
     const m = Math.floor(timerSeconds / 60), s = timerSeconds % 60;
-    document.getElementById('timerDisplay').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    document.getElementById('timerDisplay').textContent = `${m}:${s.toString().padStart(2,'0')}`;
 }
 function toggleTimer() { timerRunning ? stopTimer() : startTimer(); }
 function startTimer() {
@@ -825,7 +802,7 @@ function startTimer() {
     timerInterval = setInterval(() => {
         timerSeconds--;
         updateTimerDisplay();
-        document.getElementById('timerProgress').style.width = ((timerSeconds / timerTotal) * 100) + '%';
+        document.getElementById('timerProgress').style.width = ((timerSeconds/timerTotal)*100)+'%';
         if (timerSeconds <= 0) timerDone();
     }, 1000);
 }
@@ -838,7 +815,6 @@ function stopTimer() {
 function resetTimer() {
     stopTimer(); timerSeconds = timerTotal; updateTimerDisplay();
     document.getElementById('timerProgress').style.width = '100%';
-    document.getElementById('timerDisplay').className = 'timer-display';
     document.getElementById('btnTimerStart').textContent = 'התחל';
 }
 function timerDone() {
@@ -853,13 +829,12 @@ function timerDone() {
 function startBgTimer() {
     if (bgWorker) bgWorker.terminate();
     const code = `let s=${timerSeconds};const i=setInterval(()=>{s--;postMessage({seconds:s});if(s<=0){clearInterval(i);postMessage({done:true});}},1000);`;
-    bgWorker = new Worker(URL.createObjectURL(new Blob([code], { type: 'application/javascript' })));
+    bgWorker = new Worker(URL.createObjectURL(new Blob([code],{type:'application/javascript'})));
     bgWorker.onmessage = (e) => {
-        if (e.data.done && timerRunning) { timerSeconds = 0; timerDone(); }
+        if (e.data.done && timerRunning) { timerSeconds=0; timerDone(); }
         else if (e.data.seconds !== undefined) {
-            timerSeconds = e.data.seconds;
-            updateTimerDisplay();
-            document.getElementById('timerProgress').style.width = ((timerSeconds / timerTotal) * 100) + '%';
+            timerSeconds = e.data.seconds; updateTimerDisplay();
+            document.getElementById('timerProgress').style.width = ((timerSeconds/timerTotal)*100)+'%';
         }
     };
 }
