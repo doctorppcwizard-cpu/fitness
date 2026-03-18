@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>המאמן האישי שלי</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .header .date {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #1a1a2e;
+            color: #888;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            background: #00b4d8;
+            color: #fff;
+        }
+
+        /* Form */
+        .form-section {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .form-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            background: #0f0f23;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: #00b4d8;
+        }
+        .input-group input::placeholder {
+            color: #555;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        .row .input-group {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Current Workout */
+        .workout-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .workout-card .info h3 {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .workout-card .info span {
+            font-size: 13px;
+            color: #888;
+        }
+        .workout-card .info .weight-tag {
+            display: inline-block;
+            background: #0077b6;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #ff4757;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .btn-delete:hover {
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        /* Save Workout */
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00c853, #009624);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.1s;
+        }
+        .btn-save:active {
+            transform: scale(0.98);
+        }
+        .btn-save:disabled {
+            opacity: 0.5;
+        }
+
+        /* History */
+        .history-section {
+            display: none;
+        }
+        .history-section.active {
+            display: block;
+        }
+        .history-day {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .history-day .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        .history-day .day-header h3 {
+            color: #00b4d8;
+            font-size: 16px;
+        }
+        .history-day .day-header span {
+            color: #888;
+            font-size: 13px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #1f1f3a;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-item .name {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        .history-item .details {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #555;
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        /* Status bar */
+        .status {
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            color: #888;
+            min-height: 30px;
+        }
+        .status.success { color: #00c853; }
+        .status.error { color: #ff4757; }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        /* Stats section */
+        .add-section { display: block; }
+        .add-section.hidden { display: none; }
+
+        /* ====== REST TIMER ====== */
+        .timer-section {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .timer-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+        .timer-presets {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .timer-preset {
+            padding: 8px 16px;
+            border: 2px solid #2a2a4a;
+            border-radius: 10px;
+            background: transparent;
+            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .timer-preset.active {
+            border-color: #00b4d8;
+            color: #00b4d8;
+        }
+        .timer-display {
+            font-size: 72px;
+            font-weight: 800;
+            color: #fff;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+        .timer-display.running {
+            color: #00b4d8;
+        }
+        .timer-display.done {
+            color: #00c853;
+            animation: pulse 0.5s ease infinite alternate;
+        }
+        @keyframes pulse {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.7; transform: scale(1.05); }
+        }
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn-timer {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .btn-timer:active {
+            transform: scale(0.96);
+        }
+        .btn-timer-start {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: #fff;
+            flex: 1;
+        }
+        .btn-timer-stop {
+            background: linear-gradient(135deg, #ff4757, #c0392b);
+            color: #fff;
+            flex: 1;
+        }
+        .btn-timer-reset {
+            background: #2a2a4a;
+            color: #888;
+            padding: 14px 20px;
+        }
+        .timer-progress {
+            width: 100%;
+            height: 6px;
+            background: #2a2a4a;
+            border-radius: 3px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+        .timer-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00b4d8, #00c853);
+            border-radius: 3px;
+            transition: width 0.3s linear;
+            width: 100%;
+        }
+        .notification-btn {
+            display: block;
+            margin: 12px auto 0;
+            padding: 8px 16px;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            background: transparent;
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .notification-btn.granted {
+            border-color: #00c853;
+            color: #00c853;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>&#128170; המאמן האישי</h1>
+        <div class="date" id="todayDate"></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('add')">אימון חדש</button>
+        <button class="tab" onclick="switchTab('timer')">טיימר</button>
+        <button class="tab" onclick="switchTab('history')">היסטוריה</button>
+    </div>
+
+    <!-- Add Workout Tab -->
+    <div class="add-section" id="addSection">
+        <div class="form-section">
+            <h2>הוסף תרגיל</h2>
+            <div class="input-group">
+                <label>שם התרגיל</label>
+                <input type="text" id="exerciseName" placeholder="למשל: לחיצת חזה">
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>סטים</label>
+                    <input type="number" id="sets" placeholder="3" min="1">
+                </div>
+                <div class="input-group">
+                    <label>חזרות</label>
+                    <input type="number" id="reps" placeholder="12" min="1">
+                </div>
+                <div class="input-group">
+                    <label>משקל (ק"ג)</label>
+                    <input type="number" id="weight" placeholder="0" min="0" step="0.5">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="addExercise()">+ הוסף לאימון</button>
+        </div>
+
+        <div id="currentWorkout"></div>
+        <div id="saveArea"></div>
+        <div class="status" id="status"></div>
+    </div>
+
+    <!-- Timer Tab -->
+    <div class="history-section" id="timerSection">
+        <div class="timer-section">
+            <h2>&#9201; שעון מנוחה בין סטים</h2>
+            <div class="timer-presets">
+                <button class="timer-preset" onclick="setPreset(30)">0:30</button>
+                <button class="timer-preset active" onclick="setPreset(60)">1:00</button>
+                <button class="timer-preset" onclick="setPreset(90)">1:30</button>
+                <button class="timer-preset" onclick="setPreset(120)">2:00</button>
+                <button class="timer-preset" onclick="setPreset(180)">3:00</button>
+            </div>
+            <div class="timer-display" id="timerDisplay">1:00</div>
+            <div class="timer-progress">
+                <div class="timer-progress-bar" id="timerProgress"></div>
+            </div>
+            <div class="timer-controls" style="margin-top:16px;">
+                <button class="btn-timer btn-timer-start" id="btnStart" onclick="toggleTimer()">התחל</button>
+                <button class="btn-timer btn-timer-reset" onclick="resetTimer()">&#8635;</button>
+            </div>
+            <button class="notification-btn" id="notifBtn" onclick="requestNotificationPermission()">
+                &#128276; הפעל התראות (לצפצוף ברקע)
+            </button>
+        </div>
+    </div>
+
+    <!-- History Tab -->
+    <div class="history-section" id="historySection">
+        <div id="historyContent">
+            <div class="loading">טוען היסטוריה...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ====== CONFIGURATION ======
+    const API_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+
+    // ====== STATE ======
+    let currentExercises = [];
+
+    // ====== INIT ======
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('he-IL', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    // ====== AUDIO CONTEXT (for background beep) ======
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playBeep(times) {
+        initAudio();
+        let count = 0;
+        function beepOnce() {
+            if (count >= times) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = count === times - 1 ? 880 : 660;
+            gain.gain.value = 0.5;
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.2);
+            count++;
+            setTimeout(beepOnce, 300);
+        }
+        beepOnce();
+    }
+
+    // ====== NOTIFICATIONS (for background alert) ======
+    function requestNotificationPermission() {
+        if (!('Notification' in window)) {
+            alert('הדפדפן לא תומך בהתראות');
+            return;
+        }
+        Notification.requestPermission().then(perm => {
+            const btn = document.getElementById('notifBtn');
+            if (perm === 'granted') {
+                btn.classList.add('granted');
+                btn.innerHTML = '&#9989; התראות מופעלות';
+            } else {
+                btn.innerHTML = '&#10060; התראות נחסמו';
+            }
+        });
+    }
+
+    function sendNotification(title, body) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            const n = new Notification(title, {
+                body: body,
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">💪</text></svg>',
+                tag: 'rest-timer',
+                requireInteraction: true,
+                vibrate: [200, 100, 200, 100, 200]
+            });
+            setTimeout(() => n.close(), 8000);
+        }
+    }
+
+    // Check if already granted
+    if ('Notification' in window && Notification.permission === 'granted') {
+        const btn = document.getElementById('notifBtn');
+        btn.classList.add('granted');
+        btn.innerHTML = '&#9989; התראות מופעלות';
+    }
+
+    // ====== TIMER ======
+    let timerSeconds = 60;
+    let timerTotal = 60;
+    let timerInterval = null;
+    let timerRunning = false;
+
+    function setPreset(seconds) {
+        if (timerRunning) return;
+        timerSeconds = seconds;
+        timerTotal = seconds;
+        document.querySelectorAll('.timer-preset').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        updateTimerDisplay();
+        document.getElementById('timerProgress').style.width = '100%';
+        document.getElementById('timerDisplay').className = 'timer-display';
+    }
+
+    function updateTimerDisplay() {
+        const min = Math.floor(timerSeconds / 60);
+        const sec = timerSeconds % 60;
+        document.getElementById('timerDisplay').textContent =
+            `${min}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    function toggleTimer() {
+        if (timerRunning) {
+            stopTimer();
+        } else {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        initAudio(); // Must init on user gesture for mobile
+        if (timerSeconds <= 0) {
+            timerSeconds = timerTotal;
+        }
+        timerRunning = true;
+        const btn = document.getElementById('btnStart');
+        btn.textContent = 'עצור';
+        btn.className = 'btn-timer btn-timer-stop';
+        document.getElementById('timerDisplay').className = 'timer-display running';
+
+        // Use both setInterval AND a Web Worker fallback for background
+        startBackgroundTimer();
+
+        timerInterval = setInterval(() => {
+            timerSeconds--;
+            updateTimerDisplay();
+            const progress = (timerSeconds / timerTotal) * 100;
+            document.getElementById('timerProgress').style.width = progress + '%';
+
+            if (timerSeconds <= 0) {
+                timerDone();
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        timerRunning = false;
+        clearInterval(timerInterval);
+        stopBackgroundTimer();
+        const btn = document.getElementById('btnStart');
+        btn.textContent = 'המשך';
+        btn.className = 'btn-timer btn-timer-start';
+        document.getElementById('timerDisplay').className = 'timer-display';
+    }
+
+    function resetTimer() {
+        stopTimer();
+        timerSeconds = timerTotal;
+        updateTimerDisplay();
+        document.getElementById('timerProgress').style.width = '100%';
+        document.getElementById('timerDisplay').className = 'timer-display';
+        document.getElementById('btnStart').textContent = 'התחל';
+    }
+
+    function timerDone() {
+        stopTimer();
+        document.getElementById('timerDisplay').className = 'timer-display done';
+        document.getElementById('btnStart').textContent = 'התחל';
+        timerSeconds = 0;
+        updateTimerDisplay();
+        document.getElementById('timerProgress').style.width = '0%';
+
+        // Beep 3 times
+        playBeep(3);
+
+        // Send notification (works in background!)
+        sendNotification('סיימת מנוחה!', 'הגיע הזמן לסט הבא 💪');
+    }
+
+    // ====== BACKGROUND TIMER (Web Worker) ======
+    // Web Workers keep running when the tab is in background
+    let bgWorker = null;
+
+    function startBackgroundTimer() {
+        if (bgWorker) bgWorker.terminate();
+
+        const workerCode = `
+            let seconds = ${timerSeconds};
+            const interval = setInterval(() => {
+                seconds--;
+                postMessage({ seconds });
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    postMessage({ done: true });
+                }
+            }, 1000);
+        `;
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        bgWorker = new Worker(URL.createObjectURL(blob));
+
+        bgWorker.onmessage = (e) => {
+            if (e.data.done) {
+                // Worker says time's up — if main timer hasn't caught it
+                if (timerRunning) {
+                    timerSeconds = 0;
+                    timerDone();
+                }
+            } else {
+                // Sync main timer with worker (worker is more reliable in background)
+                timerSeconds = e.data.seconds;
+                updateTimerDisplay();
+                const progress = (timerSeconds / timerTotal) * 100;
+                document.getElementById('timerProgress').style.width = progress + '%';
+            }
+        };
+    }
+
+    function stopBackgroundTimer() {
+        if (bgWorker) {
+            bgWorker.terminate();
+            bgWorker = null;
+        }
+    }
+
+    // ====== TABS ======
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('addSection').classList.add('hidden');
+        document.getElementById('timerSection').classList.remove('active');
+        document.getElementById('historySection').classList.remove('active');
+
+        if (tab === 'add') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('addSection').classList.remove('hidden');
+        } else if (tab === 'timer') {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('timerSection').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab')[2].classList.add('active');
+            document.getElementById('historySection').classList.add('active');
+            loadHistory();
+        }
+    }
+
+    // ====== ADD EXERCISE ======
+    function addExercise() {
+        const name = document.getElementById('exerciseName').value.trim();
+        const sets = document.getElementById('sets').value;
+        const reps = document.getElementById('reps').value;
+        const weight = document.getElementById('weight').value;
+
+        if (!name || !sets || !reps) {
+            showStatus('נא למלא שם, סטים וחזרות', 'error');
+            return;
+        }
+
+        currentExercises.push({ name, sets, reps, weight: weight || '0' });
+        renderCurrentWorkout();
+
+        document.getElementById('exerciseName').value = '';
+        document.getElementById('sets').value = '';
+        document.getElementById('reps').value = '';
+        document.getElementById('weight').value = '';
+        document.getElementById('exerciseName').focus();
+    }
+
+    function removeExercise(index) {
+        currentExercises.splice(index, 1);
+        renderCurrentWorkout();
+    }
+
+    function renderCurrentWorkout() {
+        const container = document.getElementById('currentWorkout');
+        const saveArea = document.getElementById('saveArea');
+
+        if (currentExercises.length === 0) {
+            container.innerHTML = '';
+            saveArea.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = currentExercises.map((ex, i) => `
+            <div class="workout-card">
+                <div class="info">
+                    <h3>${ex.name}</h3>
+                    <span>${ex.sets} סטים x ${ex.reps} חזרות</span>
+                    ${ex.weight > 0 ? `<span class="weight-tag">${ex.weight} ק"ג</span>` : ''}
+                </div>
+                <button class="btn-delete" onclick="removeExercise(${i})">&#10006;</button>
+            </div>
+        `).join('');
+
+        saveArea.innerHTML = `
+            <button class="btn-save" onclick="saveWorkout()">
+                &#128190; שמור אימון (${currentExercises.length} תרגילים)
+            </button>
+        `;
+    }
+
+    // ====== SAVE WORKOUT ======
+    async function saveWorkout() {
+        if (currentExercises.length === 0) return;
+
+        const btn = document.querySelector('.btn-save');
+        btn.disabled = true;
+        btn.textContent = 'שומר...';
+
+        const today = new Date().toLocaleDateString('he-IL');
+        let savedCount = 0;
+
+        try {
+            for (const ex of currentExercises) {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'add',
+                        date: today,
+                        exercise: ex.name,
+                        sets: ex.sets,
+                        reps: ex.reps,
+                        weight: ex.weight,
+                        notes: ''
+                    })
+                });
+                const result = await response.json();
+                if (result.success) savedCount++;
+            }
+
+            if (savedCount === currentExercises.length) {
+                showStatus(`${savedCount} תרגילים נשמרו בהצלחה!`, 'success');
+                currentExercises = [];
+                renderCurrentWorkout();
+            } else {
+                showStatus(`נשמרו ${savedCount} מתוך ${currentExercises.length}`, 'error');
+            }
+        } catch (err) {
+            showStatus('שגיאה בשמירה — בדוק את החיבור', 'error');
+            console.error(err);
+        }
+
+        btn.disabled = false;
+    }
+
+    // ====== LOAD HISTORY ======
+    async function loadHistory() {
+        const container = document.getElementById('historyContent');
+        container.innerHTML = '<div class="loading">&#8987; טוען...</div>';
+
+        try {
+            const response = await fetch(API_URL);
+            const result = await response.json();
+
+            if (!result.data || result.data.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">&#128221;</div>
+                        <p>אין אימונים עדיין</p>
+                        <p>הוסף את האימון הראשון שלך!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const grouped = {};
+            result.data.forEach(row => {
+                const date = row['\u05ea\u05d0\u05e8\u05d9\u05da'] || row['תאריך'];
+                if (!grouped[date]) grouped[date] = [];
+                grouped[date].push(row);
+            });
+
+            const dates = Object.keys(grouped).reverse();
+            container.innerHTML = dates.map(date => `
+                <div class="history-day">
+                    <div class="day-header">
+                        <h3>${date}</h3>
+                        <span>${grouped[date].length} תרגילים</span>
+                    </div>
+                    ${grouped[date].map(row => {
+                        const exercise = row['\u05ea\u05e8\u05d2\u05d9\u05dc'] || row['תרגיל'];
+                        const sets = row['\u05e1\u05d8\u05d9\u05dd'] || row['סטים'];
+                        const reps = row['\u05d7\u05d6\u05e8\u05d5\u05ea'] || row['חזרות'];
+                        const weight = row['\u05de\u05e9\u05e7\u05dc (\u05e7"\u05d2)'] || row['משקל (ק"ג)'];
+                        return `
+                            <div class="history-item">
+                                <span class="name">${exercise}</span>
+                                <span class="details">${sets}x${reps} ${weight > 0 ? '| ' + weight + ' ק"ג' : ''}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `).join('');
+
+        } catch (err) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">&#9888;&#65039;</div>
+                    <p>שגיאה בטעינה</p>
+                    <p style="font-size:12px;color:#555">${err.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    // ====== UTILS ======
+    function showStatus(msg, type) {
+        const el = document.getElementById('status');
+        el.textContent = msg;
+        el.className = 'status ' + type;
+        setTimeout(() => { el.textContent = ''; el.className = 'status'; }, 3000);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            addExercise();
+        }
+    });
+</script>
+</body>
+</html>
