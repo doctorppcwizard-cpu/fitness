@@ -83,9 +83,23 @@
         .template-exercise {
             background: #0f0f23; border-radius: 10px; padding: 12px;
             margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+            touch-action: none;
         }
+        .template-exercise.dragging {
+            opacity: 0.9; transform: scale(1.03);
+            box-shadow: 0 8px 24px rgba(0,180,216,0.25);
+            z-index: 50; position: relative;
+        }
+        .template-exercise.drag-over-above { border-top: 2px solid #00b4d8; }
+        .template-exercise.drag-over-below { border-bottom: 2px solid #00b4d8; }
         .template-exercise .te-name { color: #fff; font-weight: 600; font-size: 14px; }
         .template-exercise .te-meta { color: #888; font-size: 12px; }
+        .drag-handle {
+            cursor: grab; padding: 8px 4px; color: #444; font-size: 18px;
+            touch-action: none; user-select: none; line-height: 1;
+        }
+        .drag-handle:active { cursor: grabbing; color: #00b4d8; }
         .btn-icon {
             background: none; border: none; font-size: 16px;
             cursor: pointer; padding: 6px; border-radius: 6px; color: #888;
@@ -449,14 +463,16 @@ function renderTemplates() {
 
     btn.style.display = 'block';
     list.innerHTML = exercises.map((ex, i) => `
-        <div class="template-exercise">
-            <div>
+        <div class="template-exercise" data-index="${i}" draggable="true">
+            <span class="drag-handle">&#9776;</span>
+            <div style="flex:1;margin:0 8px;">
                 <div class="te-name">${ex.name}</div>
                 <div class="te-meta">${ex.defaultSets} סטים x ${ex.defaultReps} חזרות${ex.lastWeight ? ' | ' + ex.lastWeight + ' ק"ג' : ''}</div>
             </div>
             <button class="btn-icon" onclick="removeExercise(${i})" title="מחק">&#128465;</button>
         </div>
     `).join('');
+    initDragAndDrop();
 }
 
 function openAddExercise() {
@@ -850,6 +866,114 @@ function showStatusMeasure(msg, type) {
     const el = document.getElementById('statusMeasure');
     el.textContent = msg; el.className = 'status ' + type;
     setTimeout(() => { el.textContent = ''; el.className = 'status'; }, 3000);
+}
+
+// ====== DRAG & DROP (touch + mouse) ======
+function initDragAndDrop() {
+    const list = document.getElementById('templateList');
+    const items = list.querySelectorAll('.template-exercise');
+    let dragItem = null;
+    let dragStartY = 0;
+    let placeholder = null;
+
+    items.forEach(item => {
+        const handle = item.querySelector('.drag-handle');
+
+        // --- TOUCH ---
+        handle.addEventListener('touchstart', (e) => {
+            dragItem = item;
+            dragStartY = e.touches[0].clientY;
+            item.classList.add('dragging');
+            e.preventDefault();
+        }, { passive: false });
+
+        // --- MOUSE (desktop) ---
+        item.addEventListener('dragstart', (e) => {
+            dragItem = item;
+            item.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        item.addEventListener('dragend', () => {
+            if (dragItem) dragItem.classList.remove('dragging');
+            clearIndicators();
+            dragItem = null;
+        });
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (!dragItem || dragItem === item) return;
+            clearIndicators();
+            const rect = item.getBoundingClientRect();
+            const mid = rect.top + rect.height / 2;
+            if (e.clientY < mid) {
+                item.classList.add('drag-over-above');
+            } else {
+                item.classList.add('drag-over-below');
+            }
+        });
+        item.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (!dragItem || dragItem === item) return;
+            const fromIdx = parseInt(dragItem.dataset.index);
+            const toIdx = parseInt(item.dataset.index);
+            reorderExercise(fromIdx, toIdx);
+        });
+    });
+
+    // --- TOUCH MOVE/END on document ---
+    document.addEventListener('touchmove', (e) => {
+        if (!dragItem) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+        clearIndicators();
+        for (const el of elements) {
+            const target = el.closest('.template-exercise');
+            if (target && target !== dragItem) {
+                const rect = target.getBoundingClientRect();
+                const mid = rect.top + rect.height / 2;
+                if (touch.clientY < mid) {
+                    target.classList.add('drag-over-above');
+                } else {
+                    target.classList.add('drag-over-below');
+                }
+                break;
+            }
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+        if (!dragItem) return;
+        const touch = e.changedTouches[0];
+        const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+        let target = null;
+        for (const el of elements) {
+            target = el.closest('.template-exercise');
+            if (target && target !== dragItem) break;
+            target = null;
+        }
+        if (target) {
+            const fromIdx = parseInt(dragItem.dataset.index);
+            const toIdx = parseInt(target.dataset.index);
+            reorderExercise(fromIdx, toIdx);
+        }
+        dragItem.classList.remove('dragging');
+        clearIndicators();
+        dragItem = null;
+    });
+
+    function clearIndicators() {
+        list.querySelectorAll('.drag-over-above, .drag-over-below').forEach(el => {
+            el.classList.remove('drag-over-above', 'drag-over-below');
+        });
+    }
+}
+
+function reorderExercise(fromIdx, toIdx) {
+    const exercises = templates[currentWorkoutType];
+    const [moved] = exercises.splice(fromIdx, 1);
+    exercises.splice(toIdx, 0, moved);
+    saveTemplates(templates);
+    renderTemplates();
 }
 </script>
 </body>
