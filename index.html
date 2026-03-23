@@ -159,6 +159,33 @@
             cursor: pointer; font-size: 12px;
         }
 
+        /* Inline Rest Timer (inside live workout) */
+        .inline-timer {
+            background: linear-gradient(135deg, #1a1a2e, #0f0f23);
+            border: 2px solid #00b4d8; border-radius: 16px;
+            padding: 16px; margin-bottom: 12px; text-align: center;
+            animation: timerSlideIn 0.3s ease;
+        }
+        .inline-timer.done { border-color: #00c853; }
+        @keyframes timerSlideIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        .inline-timer-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .inline-timer-display { font-size: 52px; font-weight: 800; color: #00b4d8; font-variant-numeric: tabular-nums; line-height: 1; }
+        .inline-timer.done .inline-timer-display { color: #00c853; }
+        .inline-timer-progress { width: 100%; height: 4px; background: #2a2a4a; border-radius: 2px; margin: 10px 0 8px; overflow: hidden; }
+        .inline-timer-bar { height: 100%; background: linear-gradient(90deg, #00b4d8, #00c853); border-radius: 2px; transition: width 0.3s linear; }
+        .inline-timer-btns { display: flex; gap: 8px; justify-content: center; }
+        .inline-timer-btns button { padding: 6px 16px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-skip { background: #2a2a4a; color: #888; }
+        .btn-add30 { background: rgba(0,180,216,0.15); color: #00b4d8; border: 1px solid #00b4d8 !important; }
+
+        /* Rest time config */
+        .rest-config { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 8px 0 14px; flex-wrap: wrap; }
+        .rest-config label { font-size: 12px; color: #888; }
+        .rest-config select {
+            padding: 6px 8px; border: 1px solid #2a2a4a; border-radius: 8px;
+            background: #0f0f23; color: #fff; font-size: 13px; outline: none;
+        }
+
         /* Timer */
         .timer-display {
             font-size: 68px; font-weight: 800; color: #fff;
@@ -276,6 +303,17 @@
                 <h2 id="liveTitle">&#128293; אימון פעיל</h2>
                 <span class="live-timer" id="workoutTimer">00:00</span>
             </div>
+            <div class="rest-config">
+                <label>&#9201; מנוחה בין סטים:</label>
+                <select id="restBetweenSets" onchange="saveRestConfig()">
+                    <option value="30">30 שניות</option>
+                    <option value="60" selected>1 דקה</option>
+                    <option value="90">1:30</option>
+                    <option value="120">2 דקות</option>
+                    <option value="180">3 דקות</option>
+                </select>
+            </div>
+            <div id="inlineTimerContainer"></div>
             <div id="liveExercises"></div>
             <div style="display:flex;gap:8px;margin-top:12px;">
                 <button class="btn btn-green" onclick="saveLiveWorkout()" style="flex:1;">&#128190; שמור אימון</button>
@@ -378,6 +416,23 @@
     <button class="nav-item" onclick="switchSection('history')"><span class="nav-icon">&#128202;</span>היסטוריה</button>
 </div>
 
+<!-- Edit Exercise Modal -->
+<div class="modal-overlay" id="editExerciseModal">
+    <div class="modal">
+        <h2>&#9998; ערוך תרגיל</h2>
+        <div class="input-group"><label>שם התרגיל</label><input type="text" id="editExerciseName"></div>
+        <div class="row">
+            <div class="input-group"><label>סטים</label><input type="number" id="editExerciseSets" min="1"></div>
+            <div class="input-group"><label>חזרות</label><input type="number" id="editExerciseReps" min="1"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn-blue" onclick="saveEditExercise()" style="flex:1;">שמור</button>
+            <button class="btn btn-red btn-sm" onclick="deleteEditExercise()" style="width:60px;">&#128465;</button>
+            <button class="btn btn-gray" onclick="closeEditExercise()" style="flex:1;">ביטול</button>
+        </div>
+    </div>
+</div>
+
 <!-- Add Exercise Modal -->
 <div class="modal-overlay" id="addExerciseModal">
     <div class="modal">
@@ -465,11 +520,11 @@ function renderTemplates() {
     list.innerHTML = exercises.map((ex, i) => `
         <div class="template-exercise" data-index="${i}" draggable="true">
             <span class="drag-handle">&#9776;</span>
-            <div style="flex:1;margin:0 8px;">
+            <div style="flex:1;margin:0 8px;cursor:pointer;" onclick="openEditExercise(${i})">
                 <div class="te-name">${ex.name}</div>
                 <div class="te-meta">${ex.defaultSets} סטים x ${ex.defaultReps} חזרות${ex.lastWeight ? ' | ' + ex.lastWeight + ' ק"ג' : ''}</div>
             </div>
-            <button class="btn-icon" onclick="removeExercise(${i})" title="מחק">&#128465;</button>
+            <button class="btn-icon" onclick="openEditExercise(${i})" title="ערוך">&#9998;</button>
         </div>
     `).join('');
     initDragAndDrop();
@@ -503,6 +558,7 @@ function removeExercise(index) {
 }
 
 renderTemplates();
+loadRestConfig();
 
 // ====== LIVE WORKOUT ======
 function startLiveWorkout() {
@@ -563,11 +619,140 @@ function toggleSet(ei, si) {
     const isChecked = check.classList.toggle('checked');
     row.classList.toggle('done', isChecked);
 
-    // Auto-start rest timer when checking a set
-    if (isChecked && typeof resetTimer === 'function') {
-        resetTimer();
-        startTimer();
+    // Auto-start inline rest timer when checking a set
+    if (isChecked) {
+        const restTime = parseInt(document.getElementById('restBetweenSets').value) || 60;
+        startInlineTimer(restTime);
     }
+}
+
+// ====== INLINE REST TIMER ======
+let inlineTimerInterval = null;
+let inlineTimerWorker = null;
+let inlineTimerSeconds = 0;
+let inlineTimerTotal = 0;
+
+function startInlineTimer(seconds) {
+    clearInlineTimer();
+    inlineTimerSeconds = seconds;
+    inlineTimerTotal = seconds;
+    initAudio();
+
+    const container = document.getElementById('inlineTimerContainer');
+    container.innerHTML = `
+        <div class="inline-timer" id="inlineTimer">
+            <div class="inline-timer-label">&#9201; מנוחה</div>
+            <div class="inline-timer-display" id="inlineTimerDisplay">${formatTime(seconds)}</div>
+            <div class="inline-timer-progress"><div class="inline-timer-bar" id="inlineTimerBar" style="width:100%"></div></div>
+            <div class="inline-timer-btns">
+                <button class="btn-add30" onclick="addInlineTime(30)">+30</button>
+                <button class="btn-skip" onclick="clearInlineTimer()">דלג</button>
+            </div>
+        </div>
+    `;
+
+    // Background worker for when app is minimized
+    const code = `let s=${seconds};const i=setInterval(()=>{s--;postMessage({seconds:s});if(s<=0){clearInterval(i);postMessage({done:true});}},1000);`;
+    inlineTimerWorker = new Worker(URL.createObjectURL(new Blob([code],{type:'application/javascript'})));
+    inlineTimerWorker.onmessage = (e) => {
+        if (e.data.done) {
+            inlineTimerDone();
+        } else if (e.data.seconds !== undefined) {
+            inlineTimerSeconds = e.data.seconds;
+            const disp = document.getElementById('inlineTimerDisplay');
+            const bar = document.getElementById('inlineTimerBar');
+            if (disp) disp.textContent = formatTime(inlineTimerSeconds);
+            if (bar) bar.style.width = ((inlineTimerSeconds/inlineTimerTotal)*100)+'%';
+        }
+    };
+}
+
+function addInlineTime(extra) {
+    inlineTimerSeconds += extra;
+    inlineTimerTotal += extra;
+    // Restart worker with new time
+    if (inlineTimerWorker) inlineTimerWorker.terminate();
+    const code = `let s=${inlineTimerSeconds};const i=setInterval(()=>{s--;postMessage({seconds:s});if(s<=0){clearInterval(i);postMessage({done:true});}},1000);`;
+    inlineTimerWorker = new Worker(URL.createObjectURL(new Blob([code],{type:'application/javascript'})));
+    inlineTimerWorker.onmessage = (e) => {
+        if (e.data.done) { inlineTimerDone(); }
+        else if (e.data.seconds !== undefined) {
+            inlineTimerSeconds = e.data.seconds;
+            const disp = document.getElementById('inlineTimerDisplay');
+            const bar = document.getElementById('inlineTimerBar');
+            if (disp) disp.textContent = formatTime(inlineTimerSeconds);
+            if (bar) bar.style.width = ((inlineTimerSeconds/inlineTimerTotal)*100)+'%';
+        }
+    };
+}
+
+function inlineTimerDone() {
+    playBeep(3);
+    sendNotification('סיימת מנוחה!', 'הגיע הזמן לסט הבא 💪');
+    const timer = document.getElementById('inlineTimer');
+    if (timer) {
+        timer.classList.add('done');
+        const disp = document.getElementById('inlineTimerDisplay');
+        if (disp) disp.textContent = 'יאללה! 💪';
+    }
+    if (inlineTimerWorker) { inlineTimerWorker.terminate(); inlineTimerWorker = null; }
+    // Auto-remove after 3 seconds
+    setTimeout(() => clearInlineTimer(), 3000);
+}
+
+function clearInlineTimer() {
+    if (inlineTimerWorker) { inlineTimerWorker.terminate(); inlineTimerWorker = null; }
+    const container = document.getElementById('inlineTimerContainer');
+    if (container) container.innerHTML = '';
+}
+
+function formatTime(s) {
+    const m = Math.floor(s / 60);
+    return `${m}:${(s%60).toString().padStart(2,'0')}`;
+}
+
+// ====== REST CONFIG (persist) ======
+function saveRestConfig() {
+    localStorage.setItem('fitness_rest_between_sets', document.getElementById('restBetweenSets').value);
+}
+function loadRestConfig() {
+    const v = localStorage.getItem('fitness_rest_between_sets');
+    if (v) document.getElementById('restBetweenSets').value = v;
+}
+
+// ====== EDIT EXERCISE ======
+let editingExerciseIndex = -1;
+
+function openEditExercise(index) {
+    editingExerciseIndex = index;
+    const ex = templates[currentWorkoutType][index];
+    document.getElementById('editExerciseName').value = ex.name;
+    document.getElementById('editExerciseSets').value = ex.defaultSets;
+    document.getElementById('editExerciseReps').value = ex.defaultReps;
+    document.getElementById('editExerciseModal').classList.add('open');
+    setTimeout(() => document.getElementById('editExerciseName').focus(), 100);
+}
+function closeEditExercise() {
+    document.getElementById('editExerciseModal').classList.remove('open');
+    editingExerciseIndex = -1;
+}
+function saveEditExercise() {
+    if (editingExerciseIndex < 0) return;
+    const name = document.getElementById('editExerciseName').value.trim();
+    if (!name) return;
+    templates[currentWorkoutType][editingExerciseIndex].name = name;
+    templates[currentWorkoutType][editingExerciseIndex].defaultSets = document.getElementById('editExerciseSets').value || '3';
+    templates[currentWorkoutType][editingExerciseIndex].defaultReps = document.getElementById('editExerciseReps').value || '12';
+    saveTemplates(templates);
+    renderTemplates();
+    closeEditExercise();
+}
+function deleteEditExercise() {
+    if (editingExerciseIndex < 0) return;
+    templates[currentWorkoutType].splice(editingExerciseIndex, 1);
+    saveTemplates(templates);
+    renderTemplates();
+    closeEditExercise();
 }
 
 function addSet(ei) {
@@ -598,6 +783,7 @@ function cancelLiveWorkout() {
 function endLiveWorkout() {
     workoutActive = false;
     clearInterval(workoutTimerInterval);
+    clearInlineTimer();
     document.getElementById('liveView').style.display = 'none';
     document.getElementById('templateView').style.display = 'block';
     document.getElementById('workoutTimer').textContent = '00:00';
