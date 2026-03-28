@@ -144,6 +144,8 @@
             background: #0f0f23; color: #fff; font-size: 14px; outline: none;
         }
         .set-input:focus { border-color: #00b4d8; }
+        .set-input.last-workout { color: #555; }
+        .set-input.last-workout:focus { color: #fff; }
         .set-check {
             width: 40px; height: 36px; border-radius: 8px;
             border: 2px solid #2a2a4a; background: transparent;
@@ -177,6 +179,30 @@
         .inline-timer-btns button { padding: 6px 16px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
         .btn-skip { background: #2a2a4a; color: #888; }
         .btn-add30 { background: rgba(0,180,216,0.15); color: #00b4d8; border: 1px solid #00b4d8 !important; }
+
+        /* Floating Rest Timer Bubble */
+        .floating-timer-bubble {
+            position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+            background: rgba(15,15,35,0.95); border: 2px solid #00b4d8;
+            border-radius: 50px; padding: 8px 20px;
+            display: flex; align-items: center; gap: 10px;
+            z-index: 150; backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,180,216,0.3);
+            animation: bubbleSlideIn 0.3s ease;
+            cursor: pointer;
+        }
+        .floating-timer-bubble.done { border-color: #00c853; }
+        @keyframes bubbleSlideIn { from { opacity:0; transform:translateX(-50%) translateY(-20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+        .floating-timer-bubble .bubble-icon { font-size: 16px; }
+        .floating-timer-bubble .bubble-time {
+            font-size: 24px; font-weight: 800; color: #00b4d8;
+            font-variant-numeric: tabular-nums; min-width: 60px; text-align: center;
+        }
+        .floating-timer-bubble.done .bubble-time { color: #00c853; }
+        .floating-timer-bubble .bubble-skip {
+            background: #2a2a4a; border: none; color: #888;
+            padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+        }
 
         /* Rest time config */
         .rest-config { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 8px 0 14px; flex-wrap: wrap; }
@@ -306,11 +332,12 @@
             <div class="rest-config">
                 <label>&#9201; מנוחה בין סטים:</label>
                 <select id="restBetweenSets" onchange="saveRestConfig()">
-                    <option value="30">30 שניות</option>
-                    <option value="60" selected>1 דקה</option>
+                    <option value="30">0:30</option>
+                    <option value="60">1:00</option>
                     <option value="90">1:30</option>
-                    <option value="120">2 דקות</option>
-                    <option value="180">3 דקות</option>
+                    <option value="120">2:00</option>
+                    <option value="150" selected>2:30</option>
+                    <option value="180">3:00</option>
                 </select>
             </div>
             <div id="inlineTimerContainer"></div>
@@ -346,13 +373,14 @@
                 </div>
                 <div id="intervalRunForm" style="display:none;">
                     <div class="row">
-                        <div class="input-group"><label>סבבים</label><input type="number" id="intervalRounds" value="4" min="1"></div>
+                        <div class="input-group"><label>סבבים</label><input type="number" id="intervalRounds" value="4" min="1" onchange="renderIntervalRounds()"></div>
                         <div class="input-group"><label>ריצה (דק')</label><input type="number" id="intervalRunMin" value="4" min="1"></div>
                         <div class="input-group"><label>מנוחה (דק')</label><input type="number" id="intervalRestMin" value="4" min="1"></div>
                     </div>
-                    <div class="row">
-                        <div class="input-group"><label>מהירות ריצה</label><input type="number" id="intervalSpeed" placeholder="12" min="0" step="0.1"></div>
-                        <div class="input-group"><label>מרחק כולל (ק"מ)</label><input type="number" id="intervalDistance" placeholder="4" min="0" step="0.1"></div>
+                    <div id="intervalRoundsDetail" style="margin-top:12px;"></div>
+                    <div class="row" style="margin-top:8px;">
+                        <div class="input-group"><label>מרחק כולל</label><input type="number" id="intervalTotalDist" readonly style="color:#00b4d8;font-weight:700;" placeholder="-"> </div>
+                        <div class="input-group"><label>קצב ממוצע (דק'/ק"מ)</label><input type="text" id="intervalAvgPace" readonly style="color:#00b4d8;font-weight:700;" placeholder="-"></div>
                     </div>
                     <div class="input-group"><label>הערות</label><input type="text" id="intervalNotes" placeholder="רמת קושי, תחושה..."></div>
                 </div>
@@ -582,13 +610,19 @@ function startLiveWorkout() {
         const numSets = parseInt(ex.defaultSets) || 3;
         const defaultReps = ex.defaultReps || '12';
         const lastWeight = ex.lastWeight || '';
+        const lastRepsArr = ex.lastRepsPerSet || [];
+        const lastWeightsArr = ex.lastWeightsPerSet || [];
         let setsHTML = '';
         for (let si = 0; si < numSets; si++) {
+            const hasLastReps = lastRepsArr[si] !== undefined;
+            const repsValue = hasLastReps ? lastRepsArr[si] : defaultReps;
+            const repsClass = hasLastReps ? 'set-input last-workout' : 'set-input';
+            const weightValue = lastWeightsArr[si] !== undefined ? lastWeightsArr[si] : lastWeight;
             setsHTML += `
                 <div class="set-row" id="set_${ei}_${si}">
                     <span class="set-num">${si + 1}</span>
-                    <input class="set-input" type="number" id="reps_${ei}_${si}" value="${defaultReps}" min="1">
-                    <input class="set-input" type="number" id="weight_${ei}_${si}" value="${lastWeight}" placeholder="0" min="0" step="0.5">
+                    <input class="${repsClass}" type="number" id="reps_${ei}_${si}" value="${repsValue}" min="1" oninput="this.classList.remove('last-workout')">
+                    <input class="set-input" type="number" id="weight_${ei}_${si}" value="${weightValue}" placeholder="0" min="0" step="0.5">
                     <button class="set-check" id="check_${ei}_${si}" onclick="toggleSet(${ei},${si})">&#10003;</button>
                 </div>
             `;
@@ -651,6 +685,9 @@ function startInlineTimer(seconds) {
         </div>
     `;
 
+    // Floating bubble
+    showFloatingBubble(seconds);
+
     // Background worker for when app is minimized
     const code = `let s=${seconds};const i=setInterval(()=>{s--;postMessage({seconds:s});if(s<=0){clearInterval(i);postMessage({done:true});}},1000);`;
     inlineTimerWorker = new Worker(URL.createObjectURL(new Blob([code],{type:'application/javascript'})));
@@ -663,8 +700,37 @@ function startInlineTimer(seconds) {
             const bar = document.getElementById('inlineTimerBar');
             if (disp) disp.textContent = formatTime(inlineTimerSeconds);
             if (bar) bar.style.width = ((inlineTimerSeconds/inlineTimerTotal)*100)+'%';
+            updateFloatingBubble(inlineTimerSeconds);
         }
     };
+}
+
+function showFloatingBubble(seconds) {
+    removeFloatingBubble();
+    const bubble = document.createElement('div');
+    bubble.className = 'floating-timer-bubble';
+    bubble.id = 'floatingTimerBubble';
+    bubble.innerHTML = `
+        <span class="bubble-icon">&#9201;</span>
+        <span class="bubble-time" id="bubbleTime">${formatTime(seconds)}</span>
+        <button class="bubble-skip" onclick="clearInlineTimer()">&#10005;</button>
+    `;
+    bubble.addEventListener('click', (e) => {
+        if (e.target.classList.contains('bubble-skip')) return;
+        const inlineTimer = document.getElementById('inlineTimer');
+        if (inlineTimer) inlineTimer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    document.body.appendChild(bubble);
+}
+
+function updateFloatingBubble(seconds) {
+    const el = document.getElementById('bubbleTime');
+    if (el) el.textContent = formatTime(seconds);
+}
+
+function removeFloatingBubble() {
+    const bubble = document.getElementById('floatingTimerBubble');
+    if (bubble) bubble.remove();
 }
 
 function addInlineTime(extra) {
@@ -695,6 +761,13 @@ function inlineTimerDone() {
         const disp = document.getElementById('inlineTimerDisplay');
         if (disp) disp.textContent = 'יאללה! 💪';
     }
+    // Update floating bubble to done state
+    const bubble = document.getElementById('floatingTimerBubble');
+    if (bubble) {
+        bubble.classList.add('done');
+        const bubbleTime = document.getElementById('bubbleTime');
+        if (bubbleTime) bubbleTime.textContent = '💪';
+    }
     if (inlineTimerWorker) { inlineTimerWorker.terminate(); inlineTimerWorker = null; }
     // Auto-remove after 3 seconds
     setTimeout(() => clearInlineTimer(), 3000);
@@ -704,6 +777,7 @@ function clearInlineTimer() {
     if (inlineTimerWorker) { inlineTimerWorker.terminate(); inlineTimerWorker = null; }
     const container = document.getElementById('inlineTimerContainer');
     if (container) container.innerHTML = '';
+    removeFloatingBubble();
 }
 
 function formatTime(s) {
@@ -800,21 +874,27 @@ async function saveLiveWorkout() {
     btn.disabled = true;
     btn.textContent = 'שומר...';
 
-    let savedCount = 0;
     try {
+        // Collect all sets to save
+        const savePromises = [];
         for (let ei = 0; ei < exercises.length; ei++) {
             const exercise = document.getElementById(`exercise_${ei}`);
             const rows = exercise.querySelectorAll('.set-row');
+            // Save per-set reps & weights to template
+            const lastReps = [];
+            const lastWeights = [];
             for (let si = 0; si < rows.length; si++) {
                 const checked = document.getElementById(`check_${ei}_${si}`).classList.contains('checked');
-                if (!checked) continue; // Only save completed sets
+                if (!checked) continue;
                 const reps = document.getElementById(`reps_${ei}_${si}`).value;
                 const weight = document.getElementById(`weight_${ei}_${si}`).value || '0';
+                lastReps.push(reps);
+                lastWeights.push(weight);
 
-                // Save last weight to template
+                // Save last weight to template (legacy)
                 if (si === 0) templates[currentWorkoutType][ei].lastWeight = weight;
 
-                await fetch(API_URL, {
+                savePromises.push(fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
@@ -823,12 +903,18 @@ async function saveLiveWorkout() {
                         sets: `${si + 1}`, reps, weight,
                         notes: si === 0 ? `משך: ${duration}` : ''
                     })
-                });
-                savedCount++;
+                }));
+            }
+            // Store per-set history on template
+            if (lastReps.length > 0) {
+                templates[currentWorkoutType][ei].lastRepsPerSet = lastReps;
+                templates[currentWorkoutType][ei].lastWeightsPerSet = lastWeights;
             }
         }
+        // Save all sets in parallel
+        await Promise.all(savePromises);
         saveTemplates(templates);
-        showStatus(`${savedCount} סטים נשמרו!`, 'success');
+        showStatus(`${savePromises.length} סטים נשמרו!`, 'success');
         endLiveWorkout();
     } catch (err) {
         showStatus('שגיאה בשמירה', 'error');
@@ -844,6 +930,46 @@ function selectRunType(type) {
     document.getElementById('btnRunInterval').classList.toggle('active', type === 'interval');
     document.getElementById('longRunForm').style.display = type === 'long' ? 'block' : 'none';
     document.getElementById('intervalRunForm').style.display = type === 'interval' ? 'block' : 'none';
+    if (type === 'interval') renderIntervalRounds();
+}
+
+function renderIntervalRounds() {
+    const rounds = parseInt(document.getElementById('intervalRounds').value) || 4;
+    const container = document.getElementById('intervalRoundsDetail');
+    let html = '<div style="font-size:12px;color:#888;margin-bottom:6px;">מרחק לכל סבב (ק"מ):</div>';
+    for (let i = 0; i < rounds; i++) {
+        html += `
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <span style="color:#00b4d8;font-weight:700;font-size:13px;min-width:50px;">סבב ${i+1}</span>
+                <input class="set-input interval-round-dist" type="number" id="roundDist_${i}"
+                    placeholder="0.0" min="0" step="0.01" style="flex:1;width:auto;"
+                    oninput="calcIntervalTotals()">
+                <span style="color:#666;font-size:12px;">ק"מ</span>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+function calcIntervalTotals() {
+    const rounds = parseInt(document.getElementById('intervalRounds').value) || 4;
+    const runMin = parseFloat(document.getElementById('intervalRunMin').value) || 4;
+    let totalDist = 0;
+    for (let i = 0; i < rounds; i++) {
+        const el = document.getElementById(`roundDist_${i}`);
+        if (el && el.value) totalDist += parseFloat(el.value);
+    }
+    document.getElementById('intervalTotalDist').value = totalDist ? totalDist.toFixed(2) : '';
+    // Avg pace = total run time / total distance (min/km)
+    const totalRunTime = rounds * runMin;
+    if (totalDist > 0) {
+        const paceMin = totalRunTime / totalDist;
+        const paceM = Math.floor(paceMin);
+        const paceS = Math.round((paceMin - paceM) * 60);
+        document.getElementById('intervalAvgPace').value = `${paceM}:${paceS.toString().padStart(2,'0')}`;
+    } else {
+        document.getElementById('intervalAvgPace').value = '';
+    }
 }
 
 async function saveRunWorkout() {
@@ -858,13 +984,21 @@ async function saveRunWorkout() {
         if (!time && !dist) { showStatus('נא למלא זמן או מרחק', 'error'); return; }
         exercise = `[ריצה ארוכה] ${time||'-'} דק' | ${dist||'-'} ק"מ | מהירות ${speed||'-'} | קצב ${pace||'-'}`;
     } else {
-        const rounds = document.getElementById('intervalRounds').value;
+        const rounds = parseInt(document.getElementById('intervalRounds').value) || 4;
         const runMin = document.getElementById('intervalRunMin').value;
         const restMin = document.getElementById('intervalRestMin').value;
-        const speed = document.getElementById('intervalSpeed').value;
-        const dist = document.getElementById('intervalDistance').value;
+        const totalDist = document.getElementById('intervalTotalDist').value;
+        const avgPace = document.getElementById('intervalAvgPace').value;
         notes = document.getElementById('intervalNotes').value;
-        exercise = `[אינטרוולים ${rounds}x${runMin}/${restMin}] מהירות ${speed||'-'} | ${dist||'-'} ק"מ`;
+        // Collect per-round distances
+        let roundDetails = [];
+        for (let i = 0; i < rounds; i++) {
+            const el = document.getElementById(`roundDist_${i}`);
+            const dist = el ? el.value : '';
+            roundDetails.push(dist || '-');
+        }
+        const roundsStr = roundDetails.map((d,i) => `ס${i+1}:${d}`).join(' | ');
+        exercise = `[אינטרוולים ${rounds}x${runMin}/${restMin}] ${totalDist||'-'} ק"מ | קצב ${avgPace||'-'} | ${roundsStr}`;
     }
     try {
         await fetch(API_URL, {
